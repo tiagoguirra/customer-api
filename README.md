@@ -98,3 +98,8 @@ curl --request POST \
   --data password=<your_address_email_base_64> \
   --data scope=openid
 ```
+
+## Links úteis
+ - [Documentação da api](./docs/swagger.yml)
+ - [Documentação repositório](./docs/repository.md)
+ - [Documentação NestJs](https://docs.nestjs.com/)
