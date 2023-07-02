@@ -1,0 +1,215 @@
+openapi: 3.0.0
+info:
+  title: stone-api
+  description: A simple API to storage and retrieve data from redis.
+  version: 0.0.1
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /customers/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Customer identifier uuid
+          schema:
+            type : string
+            example: 123e4567-e89b-12d3-a456-426614174000
+      summary: Returns a customer data.
+      responses:
+        '200':
+          description: Returns a object with customer data.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Return a validation errors.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Access token is missing or invalid.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: When customer not found by id.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/NotFound'
+    put:
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Customer identifier uuid
+          schema:
+            type : string
+            example: 123e4567-e89b-12d3-a456-426614174000
+      summary: Update customer by id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdate'
+      responses:
+        '200':
+          description: Returns a object with customer updated data.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Return a validation errors.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Access token is missing or invalid.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: When customer not found by id.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/NotFound'
+  /customers:
+    security:
+        - bearerAuth: []
+    post:
+      summary: Create new customer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerCreate'
+      responses:
+        '201':
+          description: Returns a object with customer created data.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Return a validation errors.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Access token is missing or invalid.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: When customer not found by id.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  schemas:
+    Customer:
+      type: object
+      required: 
+        - id
+        - name
+        - document
+      properties:
+        id: 
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          example: John Doe
+        document:
+          type: string
+          example: 12345678900
+          
+
+    CustomerUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        document:
+          type: string
+          example: 12345678900
+
+    CustomerCreate:
+      type: object
+      required: 
+        - name
+        - document
+      properties:
+        name:
+          type: string
+          example: John Doe
+        document:
+          type: string
+          example: 12345678900
+    NotFound:
+        type: object
+        properties:
+          error: 
+            type: string
+            example: Not Found
+          statusCode: 
+            type: number
+            example: 404
+          message:
+            type: string
+            example: Customer not found
+
+    Unauthorized:
+        type: object
+        properties:
+          error: 
+            type: string
+            example: Unauthorized
+          statusCode: 
+            type: number
+            example: 401
+          message:
+            type: string
+            example: Invalid token
+
+    BadRequest:
+      type: object
+      properties:
+        error: 
+          type: string
+          example: Bad Request
+        statusCode: 
+          type: number
+          example: 400
+        message:
+          type: array
+          items:
+            type: string
+          example: ['name should not be empty', 'document should not be empty']
+      

@@ -1,0 +1,31 @@
+
+version: '3'
+
+services:
+  redis:
+    image: redis
+    command: redis-server
+    ports:
+      - "6379:6379"
+    networks:
+      - customer-network
+    volumes:
+      - redis:/data
+
+  customerapi:
+    build: .
+    command: npm run start:prod
+    ports:
+      - 3000:3000
+    env_file:
+      - .env.compose
+    networks:
+      - customer-network
+    depends_on:
+      - redis
+volumes:
+  redis:
+    driver: local
+networks:
+  customer-network:
+    driver: bridge
